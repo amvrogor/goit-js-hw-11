@@ -10,6 +10,8 @@ const loadMore = document.querySelector('.load-more');
 
 let page = 1;
 let per_page = 40;
+let query = '';
+let totalHits = 0;
 
 gallery.style.display = 'flex';
 gallery.style.flexWrap = 'wrap';
@@ -23,7 +25,9 @@ loadMore.addEventListener('click', onLoad);
 
 function onSubmit(e) {
   e.preventDefault();
-  const query = e.currentTarget.elements[0].value.trim().toLowerCase();
+  query = e.currentTarget.elements[0].value.trim().toLowerCase();
+  page = 1;
+  loadMore.hidden = true;
   pixaBayAPI(query, page)
     .then(data => {
       if (data.hits.length === 0) {
@@ -34,22 +38,27 @@ function onSubmit(e) {
       } else {
         gallery.innerHTML = createMarkup(data);
         loadMore.hidden = false;
-        Notiflix.Notify.success(`Hooray! We found ${data.totalHits} images.`);
+        totalHits = data.totalHits;
+        Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
         const SimpleLightboxModal = new SimpleLightbox('.gallery a').refresh();
       }
     })
     .catch(err => console.log(err));
-  return query;
 }
 
 function onLoad() {
-  query = onSubmit();
   page += 1;
-  pixaBayAPI(query, page)
-    .then(data => {
-      gallery.insertAdjacentHTML('beforeend', createMarkup(data));
-    })
-    .catch(err => console.log(err));
+  if (page > Math.ceil(totalHits / per_page)) {
+    loadMore.hidden = true;
+    Notiflix.Notify.failure(
+      "We're sorry, but you've reached the end of search results."
+    );
+  } else
+    pixaBayAPI(query, page)
+      .then(data => {
+        gallery.insertAdjacentHTML('beforeend', createMarkup(data));
+      })
+      .catch(err => console.log(err));
 }
 
 async function pixaBayAPI(query, page) {
