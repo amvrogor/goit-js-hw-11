@@ -43,10 +43,10 @@ loadMore.style.padding = '10px';
 loadMore.style.backgroundColor = '#582BB8';
 loadMore.style.color = '#fff';
 loadMore.style.borderRadius = '8px';
-loadMore.addEventListener(
-  'mouseenter',
-  e => (e.currentTarget.style.backgroundColor = '#5D21DC')
-);
+loadMore.addEventListener('mouseenter', e => {
+  e.currentTarget.style.backgroundColor = '#5D21DC';
+  e.currentTarget.style.cursor = 'pointer';
+});
 loadMore.addEventListener(
   'mouseleave',
   e => (e.currentTarget.style.backgroundColor = '#582BB8')
